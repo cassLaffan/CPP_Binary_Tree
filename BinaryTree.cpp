@@ -155,13 +155,13 @@ bool BinaryTree::hasLeftChild(BinaryTree* tree) {
 }
 
 int BinaryTree::getMinLeaf(BinaryTree* tree) {
-	int minValue = tree->getRight()->getValue();
+	int minValue = tree->getLeft()->getValue();
 
-	BinaryTree* temp = tree->getRight();
+	BinaryTree* temp = tree->getLeft();
 
-	while (temp->getLeft() != nullptr) {
-		minValue = temp->getLeft()->getValue();
-		temp = temp->getLeft();
+	while (temp->getRight() != nullptr) {
+		minValue = temp->getRight()->getValue();
+		temp = temp->getRight();
 	}
 
 	return minValue;
@@ -170,16 +170,14 @@ int BinaryTree::getMinLeaf(BinaryTree* tree) {
 // In cases where deletion is unsuccessful, the return value will be infinity
 BinaryTree* BinaryTree::deleteNode(BinaryTree* root, int node) {
 	//Either the tree is empty or we've reached a leaf that does not contain this node
-	if (root == nullptr || (!hasChildren(root) && root->getValue() != node)) {
+	if (root == nullptr || !hasLeftChild(root) && !hasRightChild(root) && (!hasChildren(root) && root->getValue() != node)) {
 		return root;
 	}
 
 	//Case by case if left or right is the correct node
-	else if (root->getLeft() != nullptr && root->getLeft()->getValue() == node) {
-		std::cout << "Flag" << std::endl;
-
+	if (root->getLeft() != nullptr && root->getLeft()->getValue() == node) {
 		// No children
-		if (!hasChildren(root->getLeft())) {
+		if (!hasChildren(root->getLeft()) && !hasLeftChild(root->getLeft()) && !hasRightChild(root->getLeft())) {
 			root->leftChild = nullptr;
 		}
 
@@ -199,26 +197,26 @@ BinaryTree* BinaryTree::deleteNode(BinaryTree* root, int node) {
 		}
 
 	}
-	else if (root->getRight() != nullptr && root->getRight()->getValue() == node) {
+	if (root->getRight() != nullptr && root->getRight()->getValue() == node) {
 
 		// No children
-		if (!hasChildren(root->getRight())) {
+		if (!hasChildren(root->getRight()) && !hasLeftChild(root->getRight()) && !hasRightChild(root->getRight())) {
 			root->rightChild = nullptr;
 		}
 
 		// Two Children (three money?)
 		else if (hasChildren(root->getRight())) {
-			int replacementValue = getMinLeaf(root->getRight()->getRight());
+			int replacementValue = getMinLeaf(root->getRight());
 			root->getRight()->value = replacementValue;
 			deleteNode(root->getRight(), replacementValue);
 		}
 
 		// One Child
 		else if (hasRightChild(root->getRight())) {
-			root->leftChild = root->getRight()->getRight();
+			root->rightChild = root->getRight()->getRight();
 		}
 		else if (hasLeftChild(root->getRight())) {
-			root->leftChild = root->getRight()->getLeft();
+			root->rightChild = root->getRight()->getLeft();
 		}
 	}
 	

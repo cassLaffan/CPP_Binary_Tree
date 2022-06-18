@@ -16,9 +16,9 @@ int main() {
     root->insert(21, root);
     root->insert(-1, root);
     root->insert(3, root);
-    root->insertInPlace(11, root);
+    //root->insertInPlace(11, root);
 
-    root->deleteNode(root, -1);
+    root->deleteNode(root, 2);
 
     root->printTree("", root, false);
 }
