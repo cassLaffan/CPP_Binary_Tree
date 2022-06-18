@@ -16,9 +16,18 @@ int main() {
     root->insert(21, root);
     root->insert(-1, root);
     root->insert(3, root);
-    //root->insertInPlace(11, root);
+    root->insertInPlace(11, root);
 
-    root->deleteNode(root, 2);
+    root->deleteNode(root, 11);
 
     root->printTree("", root, false);
+
+    std::cout << root->findMaxDepth(root) << std::endl;
+    std::cout << root->findMinDepth(root) << std::endl;
+
+    root->inOrder(root);
+    std::cout << std::endl;
+    root->preOrder(root);
+    std::cout << std::endl;
+    root->postOrder(root);
 }

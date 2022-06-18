@@ -93,6 +93,49 @@ BinaryTree* BinaryTree::getLeft() const {
 	return this->leftChild;
 }
 
+
+int BinaryTree::findMinDepth(BinaryTree* root) const {
+	if (root == nullptr) {
+		return 0;
+	}
+
+	else if (root->getLeft() == nullptr && root->getRight() == nullptr) {
+		return 1;
+	}
+
+	int left = INT_MAX;
+	int right = INT_MAX;
+
+	if (root->getLeft() != nullptr) {
+		left = findMinDepth(root->getLeft());
+	}
+
+	if (root->getRight() != nullptr) {
+		right = findMinDepth(root->getRight());
+	}
+
+	return std::min(left, right) + 1;
+
+}
+
+int BinaryTree::findMaxDepth(BinaryTree* root) const {
+	if (root == nullptr) {
+		return 0;
+	}
+	else {
+		int left = findMaxDepth(root->getLeft());
+		int right = findMaxDepth(root->getRight());
+
+		if (left > right) {
+			return left + 1;
+		}
+		else {
+			return right + 1;
+		}
+	
+	}
+}
+
 void BinaryTree::printTree(const std::string& prefix, BinaryTree* tree, bool isLeft) const{
 	if (tree != nullptr){
 		std::cout << prefix;
@@ -174,7 +217,7 @@ BinaryTree* BinaryTree::deleteNode(BinaryTree* root, int node) {
 		return root;
 	}
 
-	//Case by case if left or right is the correct node
+	// The left node is the one we're looking for.
 	if (root->getLeft() != nullptr && root->getLeft()->getValue() == node) {
 		// No children
 		if (!hasChildren(root->getLeft()) && !hasLeftChild(root->getLeft()) && !hasRightChild(root->getLeft())) {
@@ -197,6 +240,8 @@ BinaryTree* BinaryTree::deleteNode(BinaryTree* root, int node) {
 		}
 
 	}
+
+	// The right node is the one we're looking for.
 	if (root->getRight() != nullptr && root->getRight()->getValue() == node) {
 
 		// No children
@@ -220,18 +265,42 @@ BinaryTree* BinaryTree::deleteNode(BinaryTree* root, int node) {
 		}
 	}
 	
-	if (node < root->getValue() && root->getLeft() != nullptr) {
+	// None of the immediate children are the correct child.
+	if ((node < root->getValue() && root->getLeft() != nullptr) || root->getRight() == nullptr) {
 		deleteNode(root->getLeft(), node);
 	}
-	else if (node > root->getValue() && root->getRight() != nullptr) {
+	else if ((node > root->getValue() && root->getRight() != nullptr) || root->getLeft() == nullptr) {
 		deleteNode(root->getRight(), node);
 	}
 
-	if (root->getRight() == nullptr) {
-		deleteNode(root->getLeft(), node);
-	}
-	else if (root->getLeft() == nullptr) {
-		deleteNode(root->getRight(), node);
-	}
 	return root;
+}
+
+// Printing Functions
+
+void BinaryTree::inOrder(BinaryTree* tree) const {
+	if (tree == nullptr) {
+		return;
+	}
+	inOrder(tree->getLeft());
+	std::cout << " " << tree->getValue() << " ";
+	inOrder(tree->getRight());
+}
+
+void BinaryTree::preOrder(BinaryTree* tree) const {
+	if (tree == nullptr) {
+		return;
+	}
+	std::cout << " " << tree->getValue() << " ";
+	preOrder(tree->getLeft());
+	preOrder(tree->getRight());
+}
+
+void BinaryTree::postOrder(BinaryTree* tree) const {
+	if (tree == nullptr) {
+		return;
+	}
+	postOrder(tree->getLeft());
+	postOrder(tree->getRight());
+	std::cout << " " << tree->getValue() << " ";
 }
