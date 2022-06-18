@@ -16,5 +16,7 @@ int main() {
     root->insert(-1, root);
     root->insert(3, root);
 
-    root->search(41, root);
+    root->invertTree(root);
+
+    root->printTree("", root, false);
 }

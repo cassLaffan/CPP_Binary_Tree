@@ -5,6 +5,11 @@ BinaryTree::BinaryTree(int root) {
 	leftChild = nullptr;
 	rightChild = nullptr;
 }
+// delet dis
+BinaryTree::~BinaryTree() {
+	delete(this->leftChild);
+	delete(this->rightChild);
+}
 
 BinaryTree* BinaryTree::insert(int num, BinaryTree* tree) {
 	if (tree == nullptr) {
@@ -76,7 +81,58 @@ void BinaryTree::search(int num, BinaryTree* tree) {
 	}
 }
 
-int BinaryTree::deleteNode(int node) {
+void BinaryTree::invertTree(BinaryTree* tree) {
+	if (tree == nullptr) {
+		return;
+	}
+	else {
+		BinaryTree* temp;
+		temp = tree->getLeft();
+		tree->leftChild = tree->getRight();
+		tree->rightChild = temp;
+
+		invertTree(tree->getLeft());
+		invertTree(tree->getRight());
+	}
+}
+
+int BinaryTree::deleteNode(BinaryTree* root, int node) {
+	//Either the tree is empty or we've reached a leaf that does not contain this node
+	if (root == nullptr || (root->getLeft() == nullptr && root->getRight() == nullptr && root->getValue() != node)) {
+		return INT_MAX;
+	}
+	else if (root->getLeft() != nullptr && root->getLeft()->getValue() == node) {
+		root->leftChild = nullptr;
+		return node;
+	}
+	else if (root->getRight() != nullptr && root->getRight()->getValue() == node) {
+		root->rightChild = nullptr;
+		return node;
+	}
+	else if (node > root->getValue()) {
+		return deleteNode(root->getLeft(), node);
+	}
+	else if (node < root->getValue()) {
+		return deleteNode(root->getRight(), node);
+	}
+	// Two children, find the successor leaf
+	else if (root->getLeft() != nullptr && root->getRight() != nullptr && root->getValue() == node) {
+		BinaryTree* temp = root->getLeft();
+		while (temp->getRight()->getRight() != nullptr) {
+			temp = temp->getRight();
+		}
+		root->value = temp->getRight()->getValue();
+		temp->rightChild = nullptr;
+		return node;
+	}
+	// One child, moves everything up
+	else if (root->getLeft() == nullptr && root->getRight() != nullptr && root->getValue() == node) {
+		memcpy(root, root->getRight(), sizeof(root->getRight()));
+	}
+	else if (root->getLeft() != nullptr && root->getRight() == nullptr && root->getValue() == node) { 
+		memcpy(root, root->getRight(), sizeof(root->getLeft()));
+		
+	}
 
 	return node;
 }
