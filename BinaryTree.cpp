@@ -11,6 +11,51 @@ BinaryTree::~BinaryTree() {
 	delete(this->rightChild);
 }
 
+BinaryTree& BinaryTree::operator=(const BinaryTree & other) {
+	this->leftChild = other.getLeft();
+	this->rightChild = other.getRight();
+	this->value = other.getValue();
+
+	return *this;
+}
+
+BinaryTree* BinaryTree::insertInPlace(int num, BinaryTree* tree) {
+	// Will only insert if the value is strictly greater than or less than. No repeats!
+	if (num < tree->getValue()) {
+		BinaryTree* newNode = new BinaryTree(num);
+
+		if (tree->getLeft() == nullptr) {
+			tree->leftChild = newNode;
+		}
+		else if (tree->getLeft()->getValue() < num) {
+			newNode->leftChild = tree->getLeft();
+			tree->leftChild = newNode;
+		}
+		else if (tree->getLeft()->getValue() > num) {
+			newNode->rightChild = tree->getLeft();
+			tree->leftChild = newNode;
+		}
+	}
+	else if (num > tree->getValue())  {
+		BinaryTree* newNode = new BinaryTree(num);
+
+		if (tree->getRight() == nullptr) {
+			tree->leftChild = newNode;
+		}
+
+		if (tree->getRight()->getValue() < num) {
+			newNode->leftChild = tree->getRight();
+			tree->rightChild = newNode;
+		}
+		else if (tree->getRight()->getValue() > num) {
+			newNode->rightChild = tree->getRight();
+			tree->rightChild = newNode;
+		}
+	}
+
+	return tree;
+}
+
 BinaryTree* BinaryTree::insert(int num, BinaryTree* tree) {
 	if (tree == nullptr) {
 		tree = new BinaryTree(num);
@@ -96,43 +141,99 @@ void BinaryTree::invertTree(BinaryTree* tree) {
 	}
 }
 
-int BinaryTree::deleteNode(BinaryTree* root, int node) {
-	//Either the tree is empty or we've reached a leaf that does not contain this node
-	if (root == nullptr || (root->getLeft() == nullptr && root->getRight() == nullptr && root->getValue() != node)) {
-		return INT_MAX;
-	}
-	else if (root->getLeft() != nullptr && root->getLeft()->getValue() == node) {
-		root->leftChild = nullptr;
-		return node;
-	}
-	else if (root->getRight() != nullptr && root->getRight()->getValue() == node) {
-		root->rightChild = nullptr;
-		return node;
-	}
-	else if (node > root->getValue()) {
-		return deleteNode(root->getLeft(), node);
-	}
-	else if (node < root->getValue()) {
-		return deleteNode(root->getRight(), node);
-	}
-	// Two children, find the successor leaf
-	else if (root->getLeft() != nullptr && root->getRight() != nullptr && root->getValue() == node) {
-		BinaryTree* temp = root->getLeft();
-		while (temp->getRight()->getRight() != nullptr) {
-			temp = temp->getRight();
-		}
-		root->value = temp->getRight()->getValue();
-		temp->rightChild = nullptr;
-		return node;
-	}
-	// One child, moves everything up
-	else if (root->getLeft() == nullptr && root->getRight() != nullptr && root->getValue() == node) {
-		memcpy(root, root->getRight(), sizeof(root->getRight()));
-	}
-	else if (root->getLeft() != nullptr && root->getRight() == nullptr && root->getValue() == node) { 
-		memcpy(root, root->getRight(), sizeof(root->getLeft()));
-		
+
+bool BinaryTree::hasChildren(BinaryTree* tree) {
+	return (tree->getRight() != nullptr) && (tree->getLeft() != nullptr);
+}
+
+bool BinaryTree::hasRightChild(BinaryTree* tree) {
+	return (tree->getRight() != nullptr) && (tree->getLeft() == nullptr);
+}
+
+bool BinaryTree::hasLeftChild(BinaryTree* tree) {
+	return (tree->getRight() == nullptr) && (tree->getLeft() != nullptr);
+}
+
+int BinaryTree::getMinLeaf(BinaryTree* tree) {
+	int minValue = tree->getRight()->getValue();
+
+	BinaryTree* temp = tree->getRight();
+
+	while (temp->getLeft() != nullptr) {
+		minValue = temp->getLeft()->getValue();
+		temp = temp->getLeft();
 	}
 
-	return node;
+	return minValue;
+}
+
+// In cases where deletion is unsuccessful, the return value will be infinity
+BinaryTree* BinaryTree::deleteNode(BinaryTree* root, int node) {
+	//Either the tree is empty or we've reached a leaf that does not contain this node
+	if (root == nullptr || (!hasChildren(root) && root->getValue() != node)) {
+		return root;
+	}
+
+	//Case by case if left or right is the correct node
+	else if (root->getLeft() != nullptr && root->getLeft()->getValue() == node) {
+		std::cout << "Flag" << std::endl;
+
+		// No children
+		if (!hasChildren(root->getLeft())) {
+			root->leftChild = nullptr;
+		}
+
+		// Two Children (three money?)
+		else if (hasChildren(root->getLeft())) {
+			int replacementValue = getMinLeaf(root->getLeft());
+			root->getLeft()->value = replacementValue;
+			deleteNode(root->getLeft(), replacementValue);
+		}
+
+		// One Child
+		else if(hasRightChild(root->getLeft())) {
+			root->leftChild = root->getLeft()->getRight();
+		}
+		else if (hasLeftChild(root->getLeft())) {
+			root->leftChild = root->getLeft()->getLeft();
+		}
+
+	}
+	else if (root->getRight() != nullptr && root->getRight()->getValue() == node) {
+
+		// No children
+		if (!hasChildren(root->getRight())) {
+			root->rightChild = nullptr;
+		}
+
+		// Two Children (three money?)
+		else if (hasChildren(root->getRight())) {
+			int replacementValue = getMinLeaf(root->getRight()->getRight());
+			root->getRight()->value = replacementValue;
+			deleteNode(root->getRight(), replacementValue);
+		}
+
+		// One Child
+		else if (hasRightChild(root->getRight())) {
+			root->leftChild = root->getRight()->getRight();
+		}
+		else if (hasLeftChild(root->getRight())) {
+			root->leftChild = root->getRight()->getLeft();
+		}
+	}
+	
+	if (node < root->getValue() && root->getLeft() != nullptr) {
+		deleteNode(root->getLeft(), node);
+	}
+	else if (node > root->getValue() && root->getRight() != nullptr) {
+		deleteNode(root->getRight(), node);
+	}
+
+	if (root->getRight() == nullptr) {
+		deleteNode(root->getLeft(), node);
+	}
+	else if (root->getLeft() == nullptr) {
+		deleteNode(root->getRight(), node);
+	}
+	return root;
 }

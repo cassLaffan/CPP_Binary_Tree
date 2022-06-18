@@ -6,6 +6,7 @@
 
 int main() {
     BinaryTree* root = new BinaryTree(5);
+    root->insert(7, root);
     root->insert(6, root);
     root->insert(8, root);
     root->insert(2, root);
@@ -15,8 +16,9 @@ int main() {
     root->insert(21, root);
     root->insert(-1, root);
     root->insert(3, root);
+    root->insertInPlace(11, root);
 
-    root->invertTree(root);
+    root->deleteNode(root, -1);
 
     root->printTree("", root, false);
 }
