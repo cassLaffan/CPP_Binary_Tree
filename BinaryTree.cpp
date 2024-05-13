@@ -57,17 +57,17 @@ BinaryTree* BinaryTree::insertInPlace(int num, BinaryTree* tree) {
 }
 
 BinaryTree* BinaryTree::insert(int num, BinaryTree* tree) {
+	// Creates a new node here and now
 	if (tree == nullptr) {
 		tree = new BinaryTree(num);
-		return tree;
 	}
+	// Inserts where necessary
 	else {
 		if (num < tree->getValue()) {
 			if(tree->getLeft() != nullptr)
 				insert(num, tree->getLeft());
 			else {
 				tree->leftChild = new BinaryTree(num);
-				return tree;
 			}
 		}
 		else {
@@ -75,10 +75,10 @@ BinaryTree* BinaryTree::insert(int num, BinaryTree* tree) {
 				insert(num, tree->getRight());
 			else {
 				tree->rightChild = new BinaryTree(num);
-				return tree;
 			}
 		}	
 	}
+	return tree;
 }
 
 int BinaryTree::getValue() const {
@@ -151,29 +151,30 @@ void BinaryTree::printTree(const std::string& prefix, BinaryTree* tree, bool isL
 	}
 }
 
+// Will print the tree from where it finds the number
+// Otherwise nothing happens
 void BinaryTree::search(int num, BinaryTree* tree) {
 	if (tree->getValue() == num) {
 		tree->printTree("", tree, false);
 	}
 	else {
 		if (num < tree->getValue()) {
-			if (tree->getLeft() != nullptr)
+			if (tree->getLeft() != nullptr){
 				search(num, tree->getLeft());
+			}
 		}
 		else {
-			if (tree->getRight() != nullptr)
+			if (tree->getRight() != nullptr){
 				search(num, tree->getRight());
-			else
-				return;
+			}
 		}
 	}
 }
 
+// Deleted the else
+// Inverts the tree, duh
 void BinaryTree::invertTree(BinaryTree* tree) {
-	if (tree == nullptr) {
-		return;
-	}
-	else {
+	if (tree != nullptr) {
 		BinaryTree* temp;
 		temp = tree->getLeft();
 		tree->leftChild = tree->getRight();
@@ -184,6 +185,8 @@ void BinaryTree::invertTree(BinaryTree* tree) {
 	}
 }
 
+
+// Functipons that check if a tree has children
 
 bool BinaryTree::hasChildren(BinaryTree* tree) {
 	return (tree->getRight() != nullptr) && (tree->getLeft() != nullptr);
@@ -197,6 +200,8 @@ bool BinaryTree::hasLeftChild(BinaryTree* tree) {
 	return (tree->getRight() == nullptr) && (tree->getLeft() != nullptr);
 }
 
+
+// Finds the littlist leaf (sarcasm)
 int BinaryTree::getMinLeaf(BinaryTree* tree) {
 	int minValue = tree->getLeft()->getValue();
 
@@ -279,28 +284,25 @@ BinaryTree* BinaryTree::deleteNode(BinaryTree* root, int node) {
 // Printing Functions
 
 void BinaryTree::inOrder(BinaryTree* tree) const {
-	if (tree == nullptr) {
-		return;
+	if (tree != nullptr) {
+		inOrder(tree->getLeft());
+		std::cout << " " << tree->getValue() << " ";
+		inOrder(tree->getRight());
 	}
-	inOrder(tree->getLeft());
-	std::cout << " " << tree->getValue() << " ";
-	inOrder(tree->getRight());
 }
 
 void BinaryTree::preOrder(BinaryTree* tree) const {
-	if (tree == nullptr) {
-		return;
+	if (tree != nullptr) {
+		std::cout << " " << tree->getValue() << " ";
+		preOrder(tree->getLeft());
+		preOrder(tree->getRight());	
 	}
-	std::cout << " " << tree->getValue() << " ";
-	preOrder(tree->getLeft());
-	preOrder(tree->getRight());
 }
 
 void BinaryTree::postOrder(BinaryTree* tree) const {
-	if (tree == nullptr) {
-		return;
+	if (tree != nullptr) {
+		postOrder(tree->getLeft());
+		postOrder(tree->getRight());
+		std::cout << " " << tree->getValue() << " ";
 	}
-	postOrder(tree->getLeft());
-	postOrder(tree->getRight());
-	std::cout << " " << tree->getValue() << " ";
 }
